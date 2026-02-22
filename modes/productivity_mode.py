@@ -3,11 +3,97 @@ import pandas as pd
 from gitlab_utils.productivity_utils import get_user_productivity, get_team_productivity
 
 # Default team mapping
+# Team mapping
 TEAMS = {
-    "Team Dev3": ["saikrishna_b", "MohanaSriBhavitha", "Saiharshavardhan"],
-    "Team Trinity": ["kanukuntagreeshma2004", "vai5h", "praneethashish"],
-    "Team Sudo": ["vandana1735", "Shanmukh16", "Sathwikareddy_Damanagari"],
-    "Team D": ["Sahasraa", "laxmanreddypatlolla", "Abhilash653"]
+
+    # From Screenshot Teams
+
+    "Dev 3": [
+        "saikrishna_b",
+        "MohanaSriBhavitha",
+        "Saiharshavardhan"
+    ],
+
+    "Trinity": [
+        "praneethashish",
+        "vai5h",
+        "kanukuntagreeshma2004"
+    ],
+
+    "Sudo": [
+        "vandana1735",
+        "vandana_rajuldev",
+        "lakshmipavani_20"
+    ],
+
+    "Trishul": [
+        "Mukthanand21",
+        "Shanmukh16",
+        "Rushika_1105"
+    ],
+
+    "BrainStorm": [
+        "satish05",
+        "Sathwikareddy_Damanagari",
+        "Sahasraa"
+    ],
+
+    "Core": [
+        "Abhilash653",
+        "swarna_4539",
+        "laxmanreddypatlolla"
+    ],
+
+    "Magnum": [
+        "LagichettyKushal",
+        "Lakshy",
+        "pavaninagireddi"
+    ],
+
+    "TrioForce": [
+        "aravindswamy",
+        "Suma2304",
+        "koushik_18",
+        "kumari123"
+    ],
+
+    "Techops": [
+        "Habeebunissa",
+        "jeevana_31",
+        "Bhaskar_Battula"
+    ],
+
+    "Mind ops": [
+        "saiteja3005",
+        "Pranav_rs",
+        "prav2702"
+    ],
+
+    "Synergy Six": [
+        "klaxmi1908",
+        "kaveri_mamidi",
+        "dasari_Akshaya",
+        "Ashritha_P",
+        "prashanth0812",
+        "dasarajuvaishnavi04",
+        "ashrithakunjeti",
+        "srilatha",
+        "vemusripriya"
+    ],
+
+    # Custom Teams
+
+    "Code Dev": [
+        "prav2702",
+        "klaxmi1908",
+        "dasari_Akshaya"
+    ],
+
+    "SPK": [
+        "SandhyaRani_111",
+        "kaveri_mamidi",
+        "Pavani_Pothuganti"
+    ]
 }
 
 def render_productivity_dashboard(client):
