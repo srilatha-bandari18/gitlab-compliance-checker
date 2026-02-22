@@ -21,6 +21,7 @@ try:
     from modes.compliance_mode import render_compliance_mode
     from modes.user_profile import render_user_profile
     from modes.batch_mode import render_batch_mode_ui
+    from modes.productivity_mode import render_productivity_dashboard
 
 except ImportError as e:
     st.error(f"Import Error: {e}")
@@ -44,6 +45,7 @@ def main():
         [
             "Check Project Compliance",
             "User Profile Overview",
+            "Team-wise Productivity Leaderboard",
             "Batch 2026 ICFAI",
             "Batch 2026 RCTS",
         ],
@@ -86,6 +88,9 @@ def main():
                 render_user_profile(client, user_info)
             else:
                  st.error(f"User '{user_input}' not found.")
+
+    elif mode == "Team-wise Productivity Leaderboard":
+        render_productivity_dashboard(client)
 
     elif mode == "Batch 2026 ICFAI":
         render_batch_mode_ui(client, "ICFAI")
