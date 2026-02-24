@@ -226,7 +226,7 @@ def check_project_compliance(project, branch=None):
 
 def extract_path_from_url(input_str):
     try:
-        path = urlparse(input_str).path.strip("/")
+        path = urlparse(input_str).path.strip().strip("/")
         return path[:-4] if path.endswith(".git") else path
     except Exception:
         return input_str.strip()
