@@ -44,4 +44,6 @@ Thumbs.db
 *.log
 
 # Environment
+.envenv/
+venv/
 .env
