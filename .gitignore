@@ -1,6 +1,9 @@
 # Streamlit Cloud deployment files
 .streamlit/secrets.toml
 
+# Node modules (not needed for Streamlit)
+node_modules/
+
 # Python
 __pycache__/
 *.py[cod]

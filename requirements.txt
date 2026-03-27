@@ -1,23 +1,7 @@
-# Streamlit Web Framework
 streamlit==1.32.0
-
-# GitLab API Client
 python-gitlab==4.5.0
-
-# Environment Variables
 python-dotenv==1.0.1
-
-# HTTP Requests
 requests==2.31.0
-
-# Data Processing
 pandas==2.2.1
-
-# Excel Export
 xlsxwriter==3.2.0
-
-# Date Parsing
 python-dateutil==2.9.0
-
-# GitLab Utils (local package - will be installed from gitlab_utils/)
-# If deployment fails, remove this line and ensure gitlab_utils folder is in repo
