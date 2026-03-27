@@ -1,22 +1,29 @@
-# Use official Python slim image
+# Use Python 3.11 base image
 FROM python:3.11-slim
 
-# Set working directory inside container
+# Set working directory
 WORKDIR /app
 
-# Copy requirements and install dependencies
-COPY requirements.txt ./
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first (for better caching)
+COPY requirements.txt .
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all application files including assets, env files
+# Copy the rest of the application
 COPY . .
 
-# Copy and set entrypoint script permissions
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Expose the port Hugging Face expects
+EXPOSE 7860
 
-# Expose Streamlit default port
-EXPOSE 8501
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PORT=7860
 
-# Set entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+# Run Streamlit
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
