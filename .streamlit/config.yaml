@@ -1,0 +1,14 @@
+# Streamlit Cloud Deployment Configuration
+# This tells Streamlit Cloud how to run your app
+
+# Main app file to run
+main = "app.py"
+
+# Python version
+python_version = "3.11"
+
+# Install command (optional, defaults to pip install -r requirements.txt)
+# install_cmd = "pip install -r requirements.txt"
+
+# Command to run the app (optional, defaults to streamlit run main)
+# command = "streamlit run app.py"
