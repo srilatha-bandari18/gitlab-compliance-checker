@@ -379,6 +379,14 @@ def render_batch_project_compliance_internal(gl_client):
         height=150,
         placeholder="https://gitlab.com/group/project1\n12345\n..."
     )
+    
+    # Add speed optimization option
+    batch_mode = st.radio(
+        "Batch Processing Mode", 
+        options=["⚡ Fast (recent projects only)", "📊 Detailed (full analysis)"], 
+        horizontal=True,
+        key="batch_compliance_mode"
+    )
 
     if st.button("Run Batch Analysis", key="run_batch_btn"):
         lines = [line.strip() for line in project_input.splitlines() if line.strip()]
@@ -388,10 +396,12 @@ def render_batch_project_compliance_internal(gl_client):
 
         results = []
         progress_bar = st.progress(0)
+        status_text = st.empty()
 
         for i, line in enumerate(lines):
             try:
                 pid = extract_path_from_url(line)
+                status_text.text(f"Processing: {pid} ({i+1}/{len(lines)})")
                 project = get_project_with_retries(gl_client, pid)
                 report = check_project_compliance(project)
 
@@ -416,6 +426,8 @@ def render_batch_project_compliance_internal(gl_client):
                 results.append({"Project": line, "Error": str(e)})
 
             progress_bar.progress((i + 1) / len(lines))
+        
+        status_text.empty()
 
         if results:
             st.write("### 📊 Batch Summary")

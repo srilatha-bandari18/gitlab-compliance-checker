@@ -66,6 +66,9 @@ def render_batch_mode_ui(client, report_type):
             results = batch.process_batch_users(client, usernames)
 
         st.success("Batch processing complete!")
+        
+        # Debug info
+        st.info(f"📊 Processed {len(results)} users - {sum(1 for r in results if r.get('status')=='Success')} successful, {sum(1 for r in results if r.get('status')=='Error')} errors, {sum(1 for r in results if r.get('status')=='Not Found')} not found")
 
         # Prepare Data based on Report Type
         report_data = []
@@ -78,10 +81,24 @@ def render_batch_mode_ui(client, report_type):
             data = res.get("data", {})
             projects = data.get("projects", {})
 
-            # Stats Access
-            c_stats = data.get("commit_stats", {"total":0, "morning_commits":0, "afternoon_commits":0})
-            m_stats = data.get("mr_stats", {"total":0, "merged":0, "opened":0, "closed":0})
-            i_stats = data.get("issue_stats", {"total":0, "opened":0, "closed":0})
+            # Stats Access - with defaults
+            c_stats = data.get("commit_stats", {})
+            m_stats = data.get("mr_stats", {})
+            i_stats = data.get("issue_stats", {})
+            
+            # Ensure all keys exist with defaults
+            c_total = c_stats.get("total", 0)
+            c_morning = c_stats.get("morning_commits", 0)
+            c_afternoon = c_stats.get("afternoon_commits", 0)
+            
+            m_total = m_stats.get("total", 0)
+            m_merged = m_stats.get("merged", 0)
+            m_opened = m_stats.get("opened", 0)
+            m_closed = m_stats.get("closed", 0)
+            
+            i_total = i_stats.get("total", 0)
+            i_opened = i_stats.get("opened", 0)
+            i_closed = i_stats.get("closed", 0)
 
             p_personal = len(projects.get("personal", []))
             p_contributed = len(projects.get("contributed", []))
@@ -101,36 +118,40 @@ def render_batch_mode_ui(client, report_type):
                     # ICFAI Columns
                     row["Personal Projects"] = p_personal
                     row["Contributed Projects"] = p_contributed
-                    row["Total Commits"] = c_stats["total"]
-                    row["Morning Count"] = c_stats["morning_commits"]
-                    row["Afternoon Count"] = c_stats["afternoon_commits"]
-                    row["MR Open"] = m_stats["opened"]
-                    row["MR Closed"] = m_stats["closed"]
-                    row["MR Merged"] = m_stats["merged"]
-                    row["Issues Open"] = i_stats["opened"]
-                    row["Issues Closed"] = i_stats["closed"]
+                    row["Total Commits"] = c_total
+                    row["Morning Count"] = c_morning
+                    row["Afternoon Count"] = c_afternoon
+                    row["MR Open"] = m_opened
+                    row["MR Closed"] = m_closed
+                    row["MR Merged"] = m_merged
+                    row["Issues Open"] = i_opened
+                    row["Issues Closed"] = i_closed
                     row["Groups Count"] = g_count
 
                 elif report_type == "RCTS":
                     # RCTS Columns
                     row["Total Projects"] = p_personal + p_contributed
-                    row["Total Commits"] = c_stats["total"]
-                    row["MR Total"] = m_stats["total"]
-                    row["MR Merged"] = m_stats["merged"]
-                    row["MR Pending"] = m_stats["opened"]
-                    row["Issues Total"] = i_stats["total"]
+                    row["Total Commits"] = c_total
+                    row["MR Total"] = m_total
+                    row["MR Merged"] = m_merged
+                    row["MR Pending"] = m_opened
+                    row["Issues Total"] = i_total
                     row["Groups"] = g_count
-                    row["Morning Active"] = "Yes" if c_stats["morning_commits"] > 0 else "No"
-                    row["Afternoon Active"] = "Yes" if c_stats["afternoon_commits"] > 0 else "No"
+                    row["Morning Active"] = "Yes" if c_morning > 0 else "No"
+                    row["Afternoon Active"] = "Yes" if c_afternoon > 0 else "No"
             else:
-                 row["Error"] = err
+                 row["Error"] = err if err else "Unknown error"
 
             report_data.append(row)
 
         # Display Summary
         st.write(f"### 📊 Batch Summary ({report_type})")
-        df_report = pd.DataFrame(report_data)
-        st.dataframe(df_report, width="stretch")
+        
+        if not report_data:
+            st.warning("No data was returned. Please check the usernames and try again.")
+        else:
+            df_report = pd.DataFrame(report_data)
+            st.dataframe(df_report, width="stretch")
 
         # Export
         try:

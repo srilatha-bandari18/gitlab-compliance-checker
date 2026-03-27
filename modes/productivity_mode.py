@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from gitlab_utils.productivity_utils import get_user_productivity, get_team_productivity
+from gitlab_utils.productivity_utils import get_user_productivity, get_team_productivity_optimized, get_team_productivity_ultra_fast
 
 # Default team mapping
 # Team mapping
@@ -100,13 +100,17 @@ def render_productivity_dashboard(client):
     st.subheader("🏆 Team-wise Productivity Leaderboard")
 
     # 1. Selection Controls
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         selected_team = st.selectbox("Select Team", options=list(TEAMS.keys()))
 
     members = TEAMS.get(selected_team, [])
     with col2:
         selected_member = st.selectbox("Select Member", options=["All Members"] + members)
+    
+    with col3:
+        mode = st.radio("Fetch Mode", options=["Ultra", "Detailed"], horizontal=True, 
+                       help="Ultra: MRs/Issues only (5-15s). Detailed: Full data with optimizations (30-60s).")
 
     st.markdown("---")
 
@@ -114,15 +118,46 @@ def render_productivity_dashboard(client):
     st.markdown("### 👥 Team Overview")
 
     if selected_team:
+        # Create progress container
+        progress_container = st.empty()
+        status_container = st.empty()
+        
         with st.spinner(f"Fetching productivity data for {selected_team}..."):
-            team_stats = get_team_productivity(client, selected_team, members)
+            # Use progress callback for detailed mode
+            progress_bar = None
+            status_text = None
+            
+            if mode == "Ultra":
+                team_stats = get_team_productivity_ultra_fast(client, selected_team, members)
+            else:
+                # Create progress bar for detailed mode
+                progress_bar = progress_container.progress(0)
+                status_text = status_container.empty()
+                
+                def progress_callback(current, total, member_name):
+                    progress = current / total
+                    progress_bar.progress(progress)
+                    status_text.text(f"Loaded {current}/{total}: {member_name}")
+                
+                team_stats = get_team_productivity_optimized(client, selected_team, members, progress_callback)
+            
+            # Clear progress indicators
+            progress_container.empty()
+            status_container.empty()
 
         if team_stats and team_stats.get("member_stats"):
             # Display Team Metrics
-            c1, c2, c3 = st.columns(3)
-            c1.metric("Total Commits", team_stats["total_commits"])
-            c2.metric("Total MRs Merged", team_stats["total_mrs_merged"])
-            c3.metric("Total Issues Closed", team_stats["total_issues_closed"])
+            if mode == "Ultra":
+                # In Ultra mode, don't show commits metric
+                c1, c2 = st.columns(2)
+                c1.metric("Total MRs Merged", team_stats["total_mrs_merged"])
+                c2.metric("Total Issues Closed", team_stats["total_issues_closed"])
+                st.info("💡 Ultra mode: Showing MRs and Issues only. Select 'Fast' or 'Detailed' to see commits.")
+            else:
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Total Commits", team_stats["total_commits"])
+                c2.metric("Total MRs Merged", team_stats["total_mrs_merged"])
+                c3.metric("Total Issues Closed", team_stats["total_issues_closed"])
 
             # Leaderboard Table
             st.markdown("#### 🥇 Leaderboard")
@@ -139,14 +174,19 @@ def render_productivity_dashboard(client):
                     "issues_opened": "Issues Opened",
                     "issues_closed": "Issues Closed"
                 })
-                # Sort by commits
-                df_display = df_display.sort_values(by="Commits", ascending=False).reset_index(drop=True)
+                # Sort by MRs merged in Ultra mode, otherwise by commits
+                sort_by = "MRs Merged" if mode == "Ultra" else "Commits"
+                df_display = df_display.sort_values(by=sort_by, ascending=False).reset_index(drop=True)
                 df_display.index += 1 # 1-based index for ranking
                 st.dataframe(df_display, width="stretch")
 
-                # Bar Chart for Commits
-                st.markdown("#### 📊 Commits Comparison")
-                st.bar_chart(df_display.set_index("Username")["Commits"])
+                # Bar Chart for Commits (skip in Ultra mode)
+                if mode != "Ultra":
+                    st.markdown("#### 📊 Commits Comparison")
+                    st.bar_chart(df_display.set_index("Username")["Commits"])
+                else:
+                    st.markdown("#### 📊 MRs Merged Comparison")
+                    st.bar_chart(df_display.set_index("Username")["MRs Merged"])
             else:
                 st.warning("No activity found for this team.")
         else:

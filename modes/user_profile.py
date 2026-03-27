@@ -4,7 +4,7 @@ from gitlab_utils import users, projects, commits, groups, merge_requests, issue
 
 def render_user_profile(client, simple_user_info):
     """
-    Renders the User Profile UI.
+    Renders the User Profile UI with full detailed data.
     """
     if not simple_user_info:
         st.error("User info not provided.")
@@ -25,7 +25,7 @@ def render_user_profile(client, simple_user_info):
         st.markdown(f"### {name} (@{username})")
         st.markdown(f"**ID:** {user_id} | [GitLab Profile]({web_url})")
 
-    # Fetch Data
+    # Fetch Data - Full detailed mode
     with st.spinner("Fetching comprehensive user data..."):
         # 1. Projects
         proj_data = projects.get_user_projects(client, user_id, username)
