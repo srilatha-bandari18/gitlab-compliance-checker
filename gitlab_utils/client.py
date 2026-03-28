@@ -43,23 +43,37 @@ class GitLabClient:
             )
             # auth() verifies credentials
             self.client.auth()
+            # Store user info safely
+            self.current_user = self.client.user
         except gitlab.exceptions.GitlabAuthenticationError as e:
             st.error("🔑 Authentication failed! Please check your GitLab token.")
             st.error(f"Error: {str(e)}")
             print(f"Authentication Error: {e}")
             self.client = None
+            self.current_user = None
         except gitlab.exceptions.GitlabConnectionError as e:
             st.error("🌐 Connection failed! Cannot reach GitLab server.")
             st.error(f"URL: {base_url}")
             st.error(f"Error: {str(e)}")
             print(f"Connection Error: {e}")
             self.client = None
+            self.current_user = None
+        except AttributeError as e:
+            # Handle version incompatibility (e.g., 'annotations' attribute missing)
+            st.error("⚠️ GitLab server version incompatibility detected.")
+            st.error(f"URL: {base_url}")
+            st.error(f"Error: {str(e)}")
+            st.info("💡 This usually means the python-gitlab library is newer than your GitLab server. Try downgrading python-gitlab to v3.15.0")
+            print(f"AttributeError (version mismatch): {e}")
+            self.client = None
+            self.current_user = None
         except Exception as e:
             st.error("❌ Unable to connect to GitLab. Please check network or token.")
             st.error(f"URL: {base_url}")
             st.error(f"Error details: {str(e)}")
             print(f"Warning: python-gitlab init failed: {e}")
             self.client = None
+            self.current_user = None
 
     def _request(self, method, endpoint, params=None):
         url = f"{self.api_base}{endpoint}"
