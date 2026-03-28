@@ -9,13 +9,16 @@ readme = "README.md"
 license = { text = "GNU Affero General Public License v3.0" }
 requires-python = ">=3.11"
 dependencies = [
-  "requests>=2.31.0",
-  "streamlit>=1.32.0",
-  "xlsxwriter",
-  "python-gitlab",
-  "python-dotenv",
-  "pandas",
-  "python-dateutil"
+  "requests>=2.31.0,<3.0.0",
+  "streamlit>=1.32.0,<2.0.0",
+  "xlsxwriter>=3.2.0,<4.0.0",
+  "python-gitlab>=4.5.0,<5.0.0",
+  "python-dotenv>=1.0.1,<2.0.0",
+  "pandas>=2.2.0,<3.0.0",
+  "python-dateutil>=2.9.0,<3.0.0",
+  "numpy>=1.26.0,<3.0.0",
+  "pytz>=2024.1",
+  "tzdata>=2024.1; sys_platform == 'win32'"
 ]
 
 [project.optional-dependencies]
