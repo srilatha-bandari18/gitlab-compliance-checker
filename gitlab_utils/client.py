@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import gitlab
-from gitlab import Gitlab
+from gitlab import Gitlab, GitlabAuthenticationError, GitlabConnectionError
 
 def safe_api_call(func, *args, **kwargs):
     """
@@ -45,13 +45,13 @@ class GitLabClient:
             self.client.auth()
             # Store user info safely
             self.current_user = self.client.user
-        except gitlab.exceptions.GitlabAuthenticationError as e:
+        except GitlabAuthenticationError as e:
             st.error("🔑 Authentication failed! Please check your GitLab token.")
             st.error(f"Error: {str(e)}")
             print(f"Authentication Error: {e}")
             self.client = None
             self.current_user = None
-        except gitlab.exceptions.GitlabConnectionError as e:
+        except GitlabConnectionError as e:
             st.error("🌐 Connection failed! Cannot reach GitLab server.")
             st.error(f"URL: {base_url}")
             st.error(f"Error: {str(e)}")
@@ -63,7 +63,7 @@ class GitLabClient:
             st.error("⚠️ GitLab server version incompatibility detected.")
             st.error(f"URL: {base_url}")
             st.error(f"Error: {str(e)}")
-            st.info("💡 This usually means the python-gitlab library is newer than your GitLab server. Try downgrading python-gitlab to v3.15.0")
+            st.info("💡 Your GitLab server may be very old. Contact your administrator.")
             print(f"AttributeError (version mismatch): {e}")
             self.client = None
             self.current_user = None
