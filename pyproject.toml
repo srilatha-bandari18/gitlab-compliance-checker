@@ -10,8 +10,12 @@ license = { text = "GNU Affero General Public License v3.0" }
 requires-python = ">=3.11"
 dependencies = [
   "requests>=2.31.0",
-  "streamlit>=1.33.0",
-  "xlsxwriter"
+  "streamlit>=1.32.0",
+  "xlsxwriter",
+  "python-gitlab",
+  "python-dotenv",
+  "pandas",
+  "python-dateutil"
 ]
 
 [project.optional-dependencies]
@@ -22,15 +26,19 @@ dev = [
   "pre-commit"
 ]
 
-[tool.hatch.build]
-packages = ["gitlab_compliance_checker"]
+[tool.hatch.build.targets.wheel]
 include = [
   "README.md",
   "LICENSE",
   "CHANGELOG.md",
   "CONTRIBUTING.md",
   "CODE_OF_CONDUCT.md",
-  "assets/*"
+  "assets/*",
+  "*.py",
+  "gitlab_utils/**/*",
+  "modes/**/*",
+  "views/**/*",
+  "user_profile/**/*"
 ]
 
 [tool.ruff]
