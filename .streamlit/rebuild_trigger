@@ -1,0 +1,4 @@
+# Force rebuild trigger
+# Created: 2026-03-28
+# This file forces Hugging Face to reinstall dependencies
+version: 2
