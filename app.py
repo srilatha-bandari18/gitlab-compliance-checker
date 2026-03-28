@@ -37,6 +37,11 @@ def main():
     default_url = os.getenv("GITLAB_URL", "https://gitlab.com")
     default_token = os.getenv("GITLAB_TOKEN", "")
 
+    # Debug: Show if env vars are loaded (only in dev mode)
+    if os.getenv("DEBUG_MODE"):
+        st.sidebar.info(f"Env GITLAB_URL: {'✅ Set' if default_url else '❌ Empty'}")
+        st.sidebar.info(f"Env GITLAB_TOKEN: {'✅ Set' if default_token else '❌ Empty'}")
+
     gitlab_url = st.sidebar.text_input("GitLab URL", value=default_url)
     gitlab_token = st.sidebar.text_input("GitLab Token", value=default_token, type="password")
 

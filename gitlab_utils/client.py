@@ -38,13 +38,26 @@ class GitLabClient:
             self.client = Gitlab(
                 url=self.base_url,
                 private_token=private_token,
-                timeout=10,
-                ssl_verify=False
+                timeout=30,
+                ssl_verify=True
             )
-            # auth() is cheap and verifies credentials
+            # auth() verifies credentials
             self.client.auth()
+        except gitlab.exceptions.GitlabAuthenticationError as e:
+            st.error("🔑 Authentication failed! Please check your GitLab token.")
+            st.error(f"Error: {str(e)}")
+            print(f"Authentication Error: {e}")
+            self.client = None
+        except gitlab.exceptions.GitlabConnectionError as e:
+            st.error("🌐 Connection failed! Cannot reach GitLab server.")
+            st.error(f"URL: {base_url}")
+            st.error(f"Error: {str(e)}")
+            print(f"Connection Error: {e}")
+            self.client = None
         except Exception as e:
-            st.error("Unable to connect to GitLab. Please check network or token.")
+            st.error("❌ Unable to connect to GitLab. Please check network or token.")
+            st.error(f"URL: {base_url}")
+            st.error(f"Error details: {str(e)}")
             print(f"Warning: python-gitlab init failed: {e}")
             self.client = None
 
